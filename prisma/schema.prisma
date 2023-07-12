@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Agricultor {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  endereco    String
+  telefone    String
+  email       String
+  tipoDeCultivo String
+  lavouras    Lavoura[]
+  comunicacoes Comunicacao[]
+}
+
+model Lavoura {
+  id                    Int                       @id @default(autoincrement())
+  agricultor            Agricultor                @relation(fields: [agricultorID], references: [id])
+  agricultorID          Int
+  localizacaoGeografica String
+  area                  Float
+  dadosDeSolo           DadosDeSolo[]
+  recomendacoes         RecomendacoesDeFertilizantes[]
+  historicoFertilizacao HistoricoDeFertilizacao[]
+}
+
+model DadosDeSolo {
+  id           Int      @id @default(autoincrement())
+  lavoura      Lavoura  @relation(fields: [lavouraID], references: [id])
+  lavouraID    Int
+  niveisNutrientes String
+  pH           Float
+  umidade      Float
+}
+
+model RecomendacoesDeFertilizantes {
+  id           Int      @id @default(autoincrement())
+  lavoura      Lavoura  @relation(fields: [lavouraID], references: [id])
+  lavouraID    Int
+  dosesFertilizantes String
+}
+
+model HistoricoDeFertilizacao {
+  id                 Int      @id @default(autoincrement())
+  lavoura            Lavoura  @relation(fields: [lavouraID], references: [id])
+  lavouraID          Int
+  data               DateTime
+  quantidadeFertilizante Float
+  resultadosObtidos  String
+}
+
+model Comunicacao {
+  id             Int        @id @default(autoincrement())
+  agricultor     Agricultor @relation(fields: [agricultorID], references: [id])
+  agricultorID   Int
+  mensagem       String
+  data           DateTime
+}
